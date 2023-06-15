@@ -19,7 +19,7 @@ export default function InputSection() {
     if(toDoValue !== '' && datePickerValue !== ''){
     const newEntry = { id: uuidv4(), name: toDoValue, dueDate: datePickerValue };
     setToDoArray([...toDoArray, newEntry]);
-    // calculateDaysRemaining();
+    calculateDaysRemaining();
     setToDoValue('');
     setDatePickerValue('');
     // setDaysRemaining('');
@@ -33,25 +33,21 @@ export default function InputSection() {
     setToDoArray(updatedArray);
   };
 
-  // const calculateDaysRemaining = () => {
-  //   let today = new Date();
-  //   let day = today.getDate();
-  //   let month = today.getMonth() + 1;
-  //   if(month < 10){
-  //     month= '0'+ month;
-  //   }
-  //   const year = today.getFullYear();
-  //   const currentDate = year + '-' + month + '-' + day;
-  //   today = new Date(currentDate);
-  //   console.log(today)
-  //   const dueDate = datePickerValue;
-  //   const timeDifference = Math.abs(dueDate - today);
-  //   console.log(timeDifference)
-  //   const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  //   console.log(daysRemaining)
-  //   setDaysRemaining(daysRemaining);
-  // };
+  const calculateDaysRemaining = (dueDate) => {
+    const today = new Date();
+    const currentDateTime = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const dueDateTime = new Date(dueDate).getTime();
 
+    if (dueDateTime < currentDateTime) {
+      const timeDifference = Math.abs(currentDateTime - dueDateTime);
+      const daysPassed = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+      return `${daysPassed} day(s) ago`;
+    }
+
+    const timeDifference = Math.abs(dueDateTime - currentDateTime);
+    const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    return `${daysRemaining} day(s) remaining`;
+  };
 
   useEffect(() => {
     localStorage.setItem('toDoArray', JSON.stringify(toDoArray))
@@ -86,14 +82,12 @@ export default function InputSection() {
     <section>
         <ul>
           {toDoArray.map((item) => (
-            <>
             <li key={item.id}>
               <h3>Name: {item.name}</h3>
-              <span>Due Date: {item.dueDate}</span>
-              <span>Days Remaining: {daysRemaining}</span>
+              <p>Due Date: {item.dueDate}</p>
+              <p>Days Remaining: {calculateDaysRemaining(item.dueDate)}</p>
               <button onClick={() => handleRemove(item.id)}>Done</button>
             </li>
-            </>
           ))}
         </ul>
       </section>
