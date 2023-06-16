@@ -5,7 +5,7 @@ export default function InputSection() {
   const [toDoValue, setToDoValue] = useState('');
   const [toDoArray, setToDoArray] = useState(localStorage.getItem('toDoArray') ? JSON.parse(localStorage.getItem('toDoArray')) : []);
   const [datePickerValue, setDatePickerValue] = useState('')
-  const [daysRemaining, setDaysRemaining] = useState()
+  const [toDoState, setToDoState] = useState('')
 
   const handleDatePicker = (e) => {
     setDatePickerValue(e.target.value)
@@ -15,22 +15,31 @@ export default function InputSection() {
     setToDoValue(e.target.value);
   };
 
+  const handleStatusChange = (e, itemId) => {
+    const updatedToDoArray = toDoArray.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, status: e.target.value };
+      }
+      return item;
+    });
+    setToDoArray(updatedToDoArray);
+  };
+
   const handleOnClick = () => {
     if(toDoValue !== '' && datePickerValue !== ''){
-    const newEntry = { id: uuidv4(), name: toDoValue, dueDate: datePickerValue };
+    const newEntry = { 
+      id: uuidv4(),
+      name: toDoValue,
+      dueDate: datePickerValue,
+      status: 'none',
+    };
     setToDoArray([...toDoArray, newEntry]);
     calculateDaysRemaining();
     setToDoValue('');
     setDatePickerValue('');
-    // setDaysRemaining('');
     }else{
       alert('A to do name must be added');
     }
-  };
-
-  const handleRemove = (id) => {
-    const updatedArray = toDoArray.filter((item) => item.id !== id);
-    setToDoArray(updatedArray);
   };
 
   const calculateDaysRemaining = (dueDate) => {
@@ -42,7 +51,9 @@ export default function InputSection() {
       const timeDifference = Math.abs(currentDateTime - dueDateTime);
       const daysPassed = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
       return `${daysPassed} day(s) ago`;
-    }
+    }//else if(){
+      
+    //}
 
     const timeDifference = Math.abs(dueDateTime - currentDateTime);
     const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
@@ -81,12 +92,21 @@ export default function InputSection() {
     </section>
     <section>
         <ul>
+          <li id='menu-toDoList' key='menu-toDoList'><h3>Name</h3><h3>Due Date:</h3><h3>Days Remaining</h3><h3>Status:</h3></li>
           {toDoArray.map((item) => (
             <li key={item.id}>
               <h3>Name: {item.name}</h3>
               <p>Due Date: {item.dueDate}</p>
               <p>Days Remaining: {calculateDaysRemaining(item.dueDate)}</p>
-              <button onClick={() => handleRemove(item.id)}>Done</button>
+              <select name="status" id="status" value={item.status} onChange={(e) => handleStatusChange(e, item.id)}>
+                <option value="none">-</option>
+                <option value="working-on-that">Working on that</option>
+                <option value="waiting-on-feedback">Waiting on Feedback</option>
+                <option value="stuck">Stuck</option>
+                <option value="done">Done</option>
+              </select>
+
+              {/* <button onClick={() => handleRemove(item.id)}>Done</button> */}
             </li>
           ))}
         </ul>
