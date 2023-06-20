@@ -1,14 +1,11 @@
 import { useState } from 'react'
-import InputSection from '../InputSection/InputSection'
+import Dashboard from '../Dashboard/Dashboard'
 
 
 function App() {
-  
-
-
   return (
     <>
-      <InputSection />
+      <Dashboard />
     </>
   )
 }
